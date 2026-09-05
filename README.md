@@ -1,21 +1,15 @@
 # ms-barriodigital-crews
 
-Microservicio encargado de la gestión de cuadrillas, asignaciones y visitas en terreno de **BarrioDigital**.
-
-## Descripción
-
-Este servicio separa la gestión operacional de las cuadrillas del ciclo de vida transaccional del trámite, manteniendo responsabilidades claramente delimitadas.
+Microservicio encargado de la gestión y asignación de cuadrillas de **BarrioDigital**.
 
 ## Responsabilidades
 
-- Crear y modificar cuadrillas.
-- Consultar cuadrillas disponibles.
-- Gestionar disponibilidad.
-- Asignar una cuadrilla a un trámite.
-- Programar visitas.
-- Consultar asignaciones.
-- Cambiar estado de una visita.
-- Procesar tareas asíncronas relacionadas con cuadrillas.
+- Crear cuadrillas.
+- Listar cuadrillas.
+- Consultar disponibilidad.
+- Asignar cuadrillas a trámites.
+- Registrar fecha de visita.
+- Mantener estado básico de las asignaciones.
 
 ## Stack tecnológico
 
@@ -26,13 +20,12 @@ Este servicio separa la gestión operacional de las cuadrillas del ciclo de vida
 - Hibernate
 - Maven
 - MySQL
-- RabbitMQ
 - Spring Security
 - Eureka Client
 - Spring Boot Actuator
 - Docker
 
-## Puerto local
+## Puerto
 
 ```text
 8083
@@ -44,136 +37,62 @@ Este servicio separa la gestión operacional de las cuadrillas del ciclo de vida
 barriodigital_crews_db
 ```
 
-Este servicio es propietario exclusivo de esta base.
-
-## API inicial
-
-### Cuadrillas
+## API
 
 ```http
 GET  /api/v1/crews
-GET  /api/v1/crews/{crewId}
 POST /api/v1/crews
-PUT  /api/v1/crews/{crewId}
+
+GET  /api/v1/crew-assignments
+POST /api/v1/crew-assignments
 ```
 
-### Asignaciones
-
-```http
-POST  /api/v1/crew-assignments
-GET   /api/v1/crew-assignments
-GET   /api/v1/crew-assignments/{assignmentId}
-PATCH /api/v1/crew-assignments/{assignmentId}/status
-```
-
-Ejemplo:
-
-```json
-{
-  "requestId": "REQ-2026-000001",
-  "crewId": "CREW-004",
-  "scheduledAt": "2026-09-07T10:00:00Z"
-}
-```
-
-## Estados iniciales de asignación
+## Modelos
 
 ```text
-SCHEDULED
-IN_PROGRESS
-COMPLETED
-CANCELLED
+Crew
+├── id
+├── name
+└── available
 ```
 
-## Comunicación síncrona
-
-Puede ser consumido por:
-
 ```text
-ms-barriodigital-bff
-ms-barriodigital-requests
+CrewAssignment
+├── id
+├── requestId
+├── crewId
+├── scheduledAt
+└── status
 ```
 
-## RabbitMQ
-
-Puede consumir tareas relacionadas con terreno.
-
-Ejemplo:
+Estados:
 
 ```text
-q.cmd.crew
+ASIGNADA
+EN_TERRENO
+COMPLETADA
 ```
 
-Routing key:
+## Integraciones
 
 ```text
-crew.ticket
-```
-
-DLQ:
-
-```text
-q.cmd.crew.dlq
+Requests ──REST──► Crews
+BFF      ──REST──► Crews
 ```
 
 ## Seguridad
 
-Roles:
-
-```text
-ADMIN
-OPERATOR
-```
-
-## Buenas prácticas de mensajería
-
-- ACK / NACK.
-- DLQ.
-- Idempotencia.
-- `eventId`.
-- `correlationId`.
-- `traceId`.
+- JWT.
+- Spring Security.
+- Amazon Cognito.
+- RBAC.
 
 ## Observabilidad
 
 - Spring Boot Actuator.
 - Logs.
 - Health checks.
-- Métricas.
-- CloudWatch.
-
-## Variables de entorno
-
-```env
-SERVER_PORT=8083
-
-MYSQL_HOST=
-MYSQL_PORT=3306
-MYSQL_DATABASE=barriodigital_crews_db
-MYSQL_USER=
-MYSQL_PASSWORD=
-
-RABBITMQ_HOST=
-RABBITMQ_PORT=5672
-RABBITMQ_USER=
-RABBITMQ_PASSWORD=
-
-EUREKA_SERVER_URL=
-COGNITO_ISSUER_URI=
-```
-
-## Contratos
-
-Repositorio:
-
-```text
-barriodigital-contracts
-```
-
-Contratos:
-
-- OpenAPI.
-- AsyncAPI.
+- Amazon CloudWatch.
 
 ## Estructura esperada
 
@@ -186,14 +105,25 @@ src/
 │   │       ├── controller/
 │   │       ├── dto/
 │   │       ├── entity/
-│   │       ├── exception/
-│   │       ├── messaging/
 │   │       ├── repository/
+│   │       ├── service/
 │   │       ├── security/
-│   │       └── service/
+│   │       └── exception/
 │   └── resources/
 │       └── application.yml
 └── test/
+```
+
+## Contrato
+
+```text
+barriodigital-contracts/openapi/crews.openapi.yaml
+```
+
+## Ejecución
+
+```bash
+./mvnw spring-boot:run
 ```
 
 ## Docker
@@ -201,10 +131,6 @@ src/
 ```bash
 docker build -t barriodigital/crews:1.0.0 .
 ```
-
-## CI/CD
-
-GitHub Actions + SonarQube + Snyk + Docker + Amazon ECR.
 
 ## Estrategia Git
 
@@ -217,4 +143,4 @@ fix/*
 
 ## Estado
 
-🚧 Proyecto en etapa inicial de diseño y construcción.
+🚧 Proyecto en etapa inicial de diseño e implementación.
