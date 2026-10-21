@@ -20,8 +20,7 @@ Microservicio encargado de la gestión y asignación de cuadrillas de **BarrioDi
 - Hibernate
 - Maven
 - MySQL
-- Spring Security
-- Eureka Client
+- Lombok
 - Spring Boot Actuator
 - Docker
 
@@ -45,6 +44,38 @@ POST /api/v1/crews
 
 GET  /api/v1/crew-assignments
 POST /api/v1/crew-assignments
+```
+
+```bash
+curl -X POST http://localhost:8083/api/v1/crews `
+  -H "Content-Type: application/json" `
+  -d '{"name":"Cuadrilla Norte"}'
+```
+
+La cuadrilla nueva queda disponible (`available: true`) si no se indica el
+campo.
+
+Los listados se ordenan por nombre para cuadrillas y por fecha de agenda para
+asignaciones. Estas últimas se pueden filtrar por `requestId`, `crewId` o
+ambos. Crear una asignación requiere una cuadrilla existente y disponible;
+una cuadrilla marcada como no disponible produce HTTP 409. El contrato no
+define cambio de disponibilidad ni transición de estado, por lo que una
+asignación no modifica automáticamente `Crew.available`.
+
+```bash
+curl "http://localhost:8083/api/v1/crew-assignments?requestId=00000000-0000-0000-0000-000000000001"
+```
+
+```json
+[
+  {
+    "id": "6dcc94c3-d355-4ff4-9cb2-52e15952ffdc",
+    "requestId": "00000000-0000-0000-0000-000000000001",
+    "crewId": "796426f7-c60b-4ab1-a23c-dcd2d8df80fe",
+    "scheduledAt": "2026-06-01T10:00:00Z",
+    "status": "ASIGNADA"
+  }
+]
 ```
 
 ## Modelos
@@ -82,10 +113,9 @@ BFF      ──REST──► Crews
 
 ## Seguridad
 
-- JWT.
-- Spring Security.
-- Amazon Cognito.
-- RBAC.
+El BFF/gateway autentica al usuario y valida permisos. Este servicio no valida
+tokens y debe aceptar solo tráfico interno; no exponer directamente el puerto
+`8083`.
 
 ## Observabilidad
 
@@ -117,9 +147,16 @@ src/
 
 ## Alcance de la primera etapa
 
-Este primer incremento establece la estructura por capas. La implementación de
-los endpoints y reglas de negocio definidos en el contrato se realizará en
-incrementos posteriores. No se incorpora mensajería en esta etapa.
+Se implementan los endpoints definidos en OpenAPI, el modelo JPA, persistencia,
+validaciones y manejo de errores. Este servicio no usa mensajería.
+
+## Configuración local
+
+El servicio escucha en `localhost:8083` y usa MySQL en `localhost:3306` por
+defecto. Se pueden sobrescribir `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`
+y `DB_PASSWORD`. `JPA_DDL_AUTO` controla el DDL de Hibernate (por defecto
+`update`; usar migraciones controladas en producción). Actuator expone
+`health`, `info` y `metrics` bajo `/actuator`.
 
 ## Contrato
 
