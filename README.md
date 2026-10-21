@@ -36,6 +36,9 @@ Microservicio encargado de la gestión y asignación de cuadrillas de **BarrioDi
 barriodigital_crews_db
 ```
 
+Al ejecutar desde esta carpeta, Spring carga `DB_PASSWORD` desde el archivo
+compartido `../.env` del workspace. Ese archivo local no se versiona.
+
 ## API
 
 ```http
