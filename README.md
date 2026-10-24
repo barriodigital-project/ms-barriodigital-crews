@@ -33,7 +33,7 @@ Microservicio encargado de la gestión y asignación de cuadrillas de **BarrioDi
 ## Base de datos
 
 ```text
-barriodigital_crews_db
+crews_db
 ```
 
 Al ejecutar desde esta carpeta, Spring carga `DB_PASSWORD` desde el archivo
@@ -166,6 +166,11 @@ defecto. Se pueden sobrescribir `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`
 y `DB_PASSWORD`. `JPA_DDL_AUTO` controla el DDL de Hibernate (por defecto
 `update`; usar migraciones controladas en producción). Actuator expone
 `health`, `info` y `metrics` bajo `/actuator`.
+
+## Service Discovery
+
+El servicio se registra en Eureka. Por defecto usa
+`http://localhost:8761/eureka/`; se puede cambiar mediante `EUREKA_SERVER_URL`.
 
 ## Contrato
 
