@@ -13,9 +13,9 @@ public interface CrewAssignmentRepository extends JpaRepository<CrewAssignment, 
 
     List<CrewAssignment> findAllByRequestIdOrderByScheduledAtAscIdAsc(UUID requestId);
 
-    List<CrewAssignment> findAllByCrewIdOrderByScheduledAtAscIdAsc(UUID crewId);
+    List<CrewAssignment> findAllByCrew_IdOrderByScheduledAtAscIdAsc(UUID crewId);
 
-    List<CrewAssignment> findAllByRequestIdAndCrewIdOrderByScheduledAtAscIdAsc(
+    List<CrewAssignment> findAllByRequestIdAndCrew_IdOrderByScheduledAtAscIdAsc(
         UUID requestId,
         UUID crewId
     );

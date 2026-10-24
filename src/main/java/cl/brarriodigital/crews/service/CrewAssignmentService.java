@@ -34,7 +34,7 @@ public class CrewAssignmentService {
         }
 
         var assignment = new CrewAssignment();
-        assignment.setCrewId(crew.getId());
+        assignment.setCrew(crew);
         assignment.setRequestId(request.requestId());
         assignment.setScheduledAt(request.scheduledAt());
         assignment.setStatus(CrewAssignmentStatus.ASIGNADA);
@@ -46,11 +46,11 @@ public class CrewAssignmentService {
         List<CrewAssignment> assignments;
         if (requestId != null && crewId != null) {
             assignments = assignmentRepository
-                .findAllByRequestIdAndCrewIdOrderByScheduledAtAscIdAsc(requestId, crewId);
+                .findAllByRequestIdAndCrew_IdOrderByScheduledAtAscIdAsc(requestId, crewId);
         } else if (requestId != null) {
             assignments = assignmentRepository.findAllByRequestIdOrderByScheduledAtAscIdAsc(requestId);
         } else if (crewId != null) {
-            assignments = assignmentRepository.findAllByCrewIdOrderByScheduledAtAscIdAsc(crewId);
+            assignments = assignmentRepository.findAllByCrew_IdOrderByScheduledAtAscIdAsc(crewId);
         } else {
             assignments = assignmentRepository.findAllByOrderByScheduledAtAscIdAsc();
         }
@@ -61,7 +61,7 @@ public class CrewAssignmentService {
         return new CrewAssignmentResponse(
             assignment.getId(),
             assignment.getRequestId(),
-            assignment.getCrewId(),
+            assignment.getCrew().getId(),
             assignment.getScheduledAt(),
             assignment.getStatus()
         );

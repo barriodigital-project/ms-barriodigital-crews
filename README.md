@@ -87,17 +87,23 @@ curl "http://localhost:8083/api/v1/crew-assignments?requestId=00000000-0000-0000
 Crew
 ├── id
 ├── name
-└── available
+├── available
+└── assignments (1:N)
 ```
 
 ```text
 CrewAssignment
 ├── id
 ├── requestId
-├── crewId
+├── crew (N:1, FK crew_id)
 ├── scheduledAt
 └── status
 ```
+
+Una `Crew` puede tener muchas asignaciones y cada `CrewAssignment` pertenece a
+una única cuadrilla. La relación JPA se gestiona con `Crew.assignments`
+(`@OneToMany`) y `CrewAssignment.crew` (`@ManyToOne`); `crew_id` es la clave
+foránea persistida. La API mantiene `crewId` en las solicitudes y respuestas.
 
 Estados:
 
